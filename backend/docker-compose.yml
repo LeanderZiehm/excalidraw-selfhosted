@@ -1,0 +1,36 @@
+services:
+  postgres:
+    image: postgres:18
+    container_name: excalidraw-selfhosted-postgres
+    environment:
+      POSTGRES_DB: excalidraw
+      POSTGRES_USER: excalidraw
+      POSTGRES_PASSWORD: excalidraw
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U excalidraw"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  app:
+    build: .
+    container_name: excalidraw-selfhosted-api
+    depends_on:
+      postgres:
+        condition: service_healthy
+    ports:
+      - "8800:8800"
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://postgres:5432/excalidraw
+      SPRING_DATASOURCE_USERNAME: excalidraw
+      SPRING_DATASOURCE_PASSWORD: excalidraw
+      SPRING_JPA_HIBERNATE_DDL_AUTO: update
+    restart: unless-stopped
+
+volumes:
+  postgres_data:
+
