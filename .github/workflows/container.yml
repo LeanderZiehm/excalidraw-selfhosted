@@ -2,8 +2,12 @@ name: Build and Push Docker Image
 
 on:
   push:
+    branches:
+      - main       # every push to main
     tags:
-      - '*'   # Trigger only on tag creation
+      - '*'        # every tag push
+  workflow_dispatch:  # manual trigger
+
 
 permissions:
   contents: read
